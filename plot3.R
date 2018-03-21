@@ -1,0 +1,20 @@
+# Subsetting power consumption data
+power <- read.table("household_power_consumption.txt",skip=1,sep=";")
+names(power) <- c("Date", "Time", "Global_active_power", "Global_reactive_power", "Voltage", "Global_intensity", "Sub_metering1", "Sub_metering2", "Sub_metering3")
+subpower <- subset(power,power$Date=="1/2/2007" | power$Date=="2/2/2007")
+
+# Converting Time and Date
+subpower$Date <- as.Date(subpower$Date, format="%d/%m/%Y")
+subpower$Time <- strptime(subpower$Time, format="%H:%M:%S")
+subpower[1:1440,"Time"] <- format(subpower[1:1440,"Time"],"2007-02-01 %H:%M:%S")
+subpower[1441:2880,"Time"] <- format(subpower[1441:2880, "Time"], "2007-02-02 %H:%M:%S")
+
+# Plot functions
+plot(subpower$Time, subpower$Sub_metering1,type="n",xlab="",ylab="Energy sub metering")
+with(subpower,lines(Time,as.numeric(as.character(Sub_metering1))))
+with(subpower,lines(Time,as.numeric(as.character(Sub_metering2)),col="red"))
+with(subpower,lines(Time,as.numeric(as.character(Sub_metering3)),col="blue"))
+legend("topright",lty=1,col=c("black","red","blue"),legend=c("Sub_metering1", "Sub_metering2", "Sub_metering3"))
+
+# Annotating graph
+title(main="Energy sub-metering")
